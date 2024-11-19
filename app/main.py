@@ -1,6 +1,11 @@
 import html
 import json
-import os
+import os, sys
+
+try:
+    import loguru, dotenv;dotenv.load_dotenv()
+except ImportError: os.system('pip install fastcore requests loguru python-dotenv'), sys.exit(1)
+
 import re
 import time
 import traceback

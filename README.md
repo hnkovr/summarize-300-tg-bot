@@ -27,7 +27,7 @@ DEVELOPER_CHAT_ID='***' // This is your chat id, or whatever person you would li
 Then execute on the host machine:
 ```
 # poetry install
-# poetry run python main.py
+# `poetry run python main.py`
 ```
 
 Now you can query the bot.
