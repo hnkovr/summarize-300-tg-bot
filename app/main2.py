@@ -1,13 +1,12 @@
 # main2.py
 import os, sys
 from pathlib import Path
-from app.wrappers import log_and_send, log_debug_config
+from app.wrappers import log_send, log_
 from app.main2_Summarize300Client import Summarize300Client
 
 try:
-    import loguru, dotenv
+    import dotenv, yaml
     dotenv.load_dotenv()
-    import yaml
 except ImportError:
     os.system('pip install pyyaml fastcore requests loguru python-dotenv') and sys.exit(1)
 
@@ -58,11 +57,11 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             for msg in buffer:
                 await context.bot.send_message(chat_id=update.effective_chat.id, text=msg)
         except Exception as e:
-            log_and_send(context, update.effective_chat.id, f"Error processing {url}: {e}", "Error processing your request.")
+            await log_send(context, update.effective_chat.id, f"Error processing {url}: {e}")
 
 def main():
     config = AppConfig()
-    log_debug_config(config.YANDEX_OAUTH, config.YANDEX_COOKIE)
+    log_((config.YANDEX_OAUTH, config.YANDEX_COOKIE))
     app = ApplicationBuilder().token(config.TELEGRAM_BOT_TOKEN).build()
     app.bot_data.update(
         {

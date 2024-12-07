@@ -1,7 +1,7 @@
 # main2_Summarize300Client.py
 import time
 import requests
-from app.wrappers import log_request, log_response, log_and_raise, assert_
+from app.wrappers import log_, raise_
 from loguru import logger as log
 
 class Summarize300Client:
@@ -18,18 +18,18 @@ class Summarize300Client:
         log.debug(f"Summarize300Client initialized with headers: {self.headers}")
 
     def __send_request(self, json_payload):
-        log_request(self.ENDPOINT, json_payload, self.headers)
+        log_(None, endpoint=self.ENDPOINT, payload=json_payload, headers=self.headers)
         response = requests.post(self.ENDPOINT, json=json_payload, headers=self.headers)
-        log_response(response)
+        log_(response)
 
         if response.status_code == 401:
-            log_and_raise("Unauthorized: Check your YANDEX_OAUTH or YANDEX_COOKIE.", "Unauthorized: Invalid credentials.")
+            raise_("Unauthorized: Invalid credentials.")
         elif response.status_code != 200:
-            log_and_raise(f"Unexpected HTTP status: {response.status_code}, Response: {response.text}", f"HTTP {response.status_code}: {response.text}")
+            raise_(f"Unexpected HTTP status: {response.status_code}, Response: {response.text}")
         return response
 
     def _parse_article(self, url, data):
-        assert_("thesis" in data, f"{url}: Missing 'thesis' in response")
+        assert "thesis" in data, f"{url}: Missing 'thesis' in response"
         self.buffer.add(f"<b>{data['title']}</b>\n\n")
         for point in data["thesis"]:
             self.buffer.add(f"• {point['content']}\n")
@@ -38,7 +38,7 @@ class Summarize300Client:
         self.buffer.add("\n")
 
     def _parse_video(self, url, data):
-        assert_("keypoints" in data, f"{url}: Missing 'keypoints' in response")
+        assert "keypoints" in data, f"{url}: Missing 'keypoints' in response"
         self.buffer.add(f"{data['title']}\n")
         for keypoint in data["keypoints"]:
             self.buffer.add(f"• {keypoint['content']}\n")
@@ -58,7 +58,7 @@ class Summarize300Client:
             log.debug(f"Response JSON: {data}")
 
             if "status_code" not in data:
-                log_and_raise(f"Invalid API response for {url}: {data}", "Invalid API response")
+                raise_(f"Invalid API response for {url}: {data}")
 
             if data["status_code"] in (0, 2):
                 parse_fn(url, data)
@@ -73,7 +73,7 @@ class Summarize300Client:
 
             retries += 1
 
-        log_and_raise(f"Max retries exceeded for {url}", "Max retries exceeded")
+        raise_(f"Max retries exceeded for {url}")
 
 class MessageBuffer:
     MAX_LIMIT = 4096
