@@ -154,6 +154,7 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def main():
     config = AppConfig()
 
+    # Log key configuration values for debugging
     log.debug(f"YANDEX_OAUTH: {config.YANDEX_OAUTH[:10]}... (truncated)")
     log.debug(f"YANDEX_COOKIE: {config.YANDEX_COOKIE[:20]}... (truncated)")
 
