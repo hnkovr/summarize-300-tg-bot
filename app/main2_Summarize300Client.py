@@ -1,24 +1,28 @@
-# main2_Summarize300Client.py
 import time
 import requests
 from app.wrappers import log_, raise_
 from loguru import logger as log
+
+class Config:
+    @staticmethod
+    def get_headers(oauth_token, cookie):
+        return {
+            "Authorization": f"OAuth {oauth_token}",
+            "Cookie": cookie,
+            "Content-Type": "application/json",
+        }
 
 class Summarize300Client:
     ENDPOINT = "https://300.ya.ru/api/generation"
     MAX_RETRIES = 100
 
     def __init__(self, oauth_token, cookie):
-        self.headers = {
-            "Authorization": f"OAuth {oauth_token}",
-            "Cookie": cookie,
-            "Content-Type": "application/json",
-        }
+        self.headers = Config.get_headers(oauth_token, cookie)
         self.buffer = MessageBuffer()
         log.debug(f"Summarize300Client initialized with headers: {self.headers}")
 
     def __send_request(self, json_payload):
-        log_(None, endpoint=self.ENDPOINT, payload=json_payload, headers=self.headers)
+        log_(endpoint=self.ENDPOINT, payload=json_payload, headers=self.headers)
         response = requests.post(self.ENDPOINT, json=json_payload, headers=self.headers)
         log_(response)
 

@@ -1,4 +1,3 @@
-# main2.py
 import os, sys
 from pathlib import Path
 from app.wrappers import log_send, log_
@@ -39,11 +38,14 @@ class AppConfig:
     def __getattr__(self, item):
         return self.config.get(item)
 
+async def send_message(context, chat_id, text):
+    await context.bot.send_message(chat_id=chat_id, text=text)
+
 async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     log.info(f"Message from {update.effective_user.username}: {update.message.text}")
     urls = re.findall(r"(https?://[^\s&]+)", update.message.text)
     if not urls:
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="Send a valid link to an article or YouTube video.")
+        await send_message(context, update.effective_chat.id, "Send a valid link to an article or YouTube video.")
         return
 
     client = Summarize300Client(
@@ -55,7 +57,7 @@ async def message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         try:
             buffer = client.summarize(url)
             for msg in buffer:
-                await context.bot.send_message(chat_id=update.effective_chat.id, text=msg)
+                await send_message(context, update.effective_chat.id, msg)
         except Exception as e:
             await log_send(context, update.effective_chat.id, f"Error processing {url}: {e}")
 
